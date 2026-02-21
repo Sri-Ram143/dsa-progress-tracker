@@ -1,12 +1,13 @@
 package tracker.storage;
 
+import java.io.File;
 import java.util.*;
 import tracker.models.Problem;
 
 public class ProblemRepository {
     private List<Problem>problems;
     public ProblemRepository(){
-       problems=new ArrayList<>();
+       problems=FileHandler.loadFromFile();
     }
     public boolean addProblem(Problem problem){
         for(Problem p:problems){
@@ -14,7 +15,7 @@ public class ProblemRepository {
                 return false;
             }
         }
-        problems.add(problem);
+        FileHandler.saveToFile(problems);
         return true;
     }
     public List<Problem> getAllProblems(){
@@ -38,6 +39,7 @@ public class ProblemRepository {
                 return true;
             }
         }
+        FileHandler.saveToFile(problems);
         return false;
     }
 }
