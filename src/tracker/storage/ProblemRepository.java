@@ -15,6 +15,7 @@ public class ProblemRepository {
                 return false;
             }
         }
+        problems.add(problem);
         FileHandler.saveToFile(problems);
         return true;
     }
@@ -36,6 +37,7 @@ public class ProblemRepository {
         for(int i=0;i<problems.size();i++){
             if(problems.get(i).getId()==id){
                 problems.remove(i);
+                FileHandler.saveToFile(problems);
                 return true;
             }
         }
