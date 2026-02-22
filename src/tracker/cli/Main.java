@@ -3,6 +3,7 @@ package tracker.cli;
 import java.util.*;
 import tracker.models.Problem;
 import tracker.storage.ProblemRepository;
+import tracker.analytics.AnalyticsEngine;
 
 public class Main {
     private static Scanner in=new Scanner(System.in);
@@ -11,7 +12,7 @@ public class Main {
         repository=new ProblemRepository();
         while (true) {
             System.out.println("----MENU----");
-            System.out.println("1.Add Problem\n2.View Problems\n3.Delete Problem\n4.Exit\n");
+            System.out.println("1.Add Problem\n2.View Problems\n3.Delete Problem\n4.View Analytics\n5.Exit\n");
             int choice;
             System.out.print("Enter your choice: ");
             choice = in.nextInt();
@@ -27,6 +28,9 @@ public class Main {
                     deleteProblem();
                     break;
                 case 4:
+                    showAnalytics();
+                    break;
+                case 5:
                     System.out.println("exiting program!");
                     return;
                 default:
@@ -97,4 +101,27 @@ public class Main {
             System.out.println("Problem not found!");
         }
     }
+    private static void showAnalytics(){
+        if(repository.isEmpty()){
+            System.out.println("No data available for analytics");
+            return;
+        }
+        AnalyticsEngine analytics=new AnalyticsEngine(repository.getAllProblems());
+        System.out.println("\n---- ANALYTICS ----");
+
+        System.out.println("Total Problems: "+analytics.getTotalProblems());
+
+        System.out.println("Total Solved: " + analytics.getTotalSolved());
+
+        System.out.println("Accuracy: " + String.format("%.2f", analytics.getAccuracy()) + "%");
+
+        System.out.println("Average Time: " + String.format("%.2f",analytics.getAverageTime()) + " mins");
+
+        System.out.println("\nTopic Distribution:");
+
+        analytics.getTopicDistribution()
+                .forEach((topic, count) ->
+                        System.out.println(topic + " : " + count));
+    }
+
 }
