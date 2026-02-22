@@ -23,7 +23,7 @@ public class AnalyticsEngine {
         return count;
     }
 
-    public double Accuracy(){
+    public double getAccuracy(){
         if(problems.isEmpty()){
             return 0;
         }
