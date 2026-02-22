@@ -4,6 +4,7 @@ import java.util.*;
 import tracker.models.Problem;
 import tracker.storage.ProblemRepository;
 import tracker.analytics.AnalyticsEngine;
+import tracker.analytics.TopicReport;
 
 public class Main {
     private static Scanner in=new Scanner(System.in);
@@ -119,9 +120,20 @@ public class Main {
 
         System.out.println("\nTopic Distribution:");
 
-        analytics.getTopicDistribution()
-                .forEach((topic, count) ->
-                        System.out.println(topic + " : " + count));
+        analytics.getTopicDistribution().forEach((topic, count) -> System.out.println(topic + " : " + count));
+
+        List<TopicReport> reports = analytics.generateTopicReports();
+
+        System.out.println("\n---- Topic Diagnostics ----");
+
+        for (TopicReport report : reports) {
+
+            System.out.println("\nTopic: " + report.getTopic());
+            System.out.println("Attempts: " + report.getAttempts());
+            System.out.println("Accuracy: " + String.format("%.2f", report.getAccuracy()) + "%");
+            System.out.println("Avg Time: " + String.format("%.2f", report.getAverageTime()) + " mins");
+            System.out.println("Confidence: " + report.getConfidenceLevel());
+        }
     }
 
 }
