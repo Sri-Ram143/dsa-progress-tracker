@@ -1,32 +1,35 @@
 package tracker.cli;
 
 import java.util.*;
-import tracker.models.Problem;
-import tracker.storage.ProblemRepository;
+
+import tracker.analytics.Recommendation;
+import tracker.models.Attempt;
+import tracker.storage.AttemptRepository;
 import tracker.analytics.AnalyticsEngine;
 import tracker.analytics.TopicReport;
+import tracker.analytics.RecommendationReport;
 
 public class Main {
     private static Scanner in=new Scanner(System.in);
-    private static ProblemRepository repository;
+    private static AttemptRepository repository;
     public static void main(String[] args) {
-        repository=new ProblemRepository();
+        repository=new AttemptRepository();
         while (true) {
             System.out.println("----MENU----");
-            System.out.println("1.Add Problem\n2.View Problems\n3.Delete Problem\n4.View Analytics\n5.Exit\n");
+            System.out.println("1.Add Problem\n2.View Attempts\n3.Delete Attempt\n4.View Analytics\n5.Exit\n");
             int choice;
             System.out.print("Enter your choice: ");
             choice = in.nextInt();
             in.nextLine();
             switch (choice) {
                 case 1:
-                    addProblem();
+                    recordAttempt();
                     break;
                 case 2:
-                    viewProblems();
+                    viewAttempts();
                     break;
                 case 3:
-                    deleteProblem();
+                    deleteAttempt();
                     break;
                 case 4:
                     showAnalytics();
@@ -40,21 +43,16 @@ public class Main {
             }
         }
     }
-    private static void viewProblems(){
+    private static void viewAttempts(){
         if(repository.isEmpty()){
             System.out.println("no problems logged yet!");
             return;
         }
-        List<Problem> problems=repository.getAllProblems();
-        for(Problem p:problems){
-            System.out.println(p);
+        for(Attempt attempt : repository.getAllAttempts()){
+            System.out.println(attempt);
         }
     }
-    private static void addProblem(){
-        System.out.println("Enter ID: ");
-        int id=in.nextInt();
-        in.nextLine();
-
+    private static void recordAttempt(){
         System.out.println("Enter Title: ");
         String title=in.nextLine();
 
@@ -77,24 +75,18 @@ public class Main {
         System.out.println("Enter Notes: ");
         String notes=in.nextLine();
 
-        Problem problem=new Problem(id,title,platform,topic,difficulty,timeTaken,solved,notes);
-        boolean added=repository.addProblem(problem);
-        if(added){
-            System.out.println("Problem added successfully");
-        }
-        else{
-            System.out.println("duplicate id found, problem already solved, not added");
-        }
+        int attemptId=repository.recordAttempt(title,platform,topic,difficulty,timeTaken,solved,notes);
+        System.out.println("Attempt recorded with ID: " + attemptId);
     }
-    private static void deleteProblem(){
+    private static void deleteAttempt(){
         if(repository.isEmpty()){
             System.out.println("no problems to delete!");
             return;
         }
-        System.out.print("Enter ID: ");
-        int id=in.nextInt();
+        System.out.print("Enter topic: ");
+        String topic=in.nextLine();
         in.nextLine();
-        boolean deleted=repository.deleteById(id);
+        boolean deleted=repository.deleteByTopic(topic);
         if(deleted){
             System.out.println("deleted successfully!");
         }
@@ -107,7 +99,7 @@ public class Main {
             System.out.println("No data available for analytics");
             return;
         }
-        AnalyticsEngine analytics=new AnalyticsEngine(repository.getAllProblems());
+        AnalyticsEngine analytics=new AnalyticsEngine(repository.getAllAttempts());
         System.out.println("\n---- ANALYTICS ----");
 
         System.out.println("Total Problems: "+analytics.getTotalProblems());
@@ -134,6 +126,34 @@ public class Main {
             System.out.println("Avg Time: " + String.format("%.2f", report.getAverageTime()) + " mins");
             System.out.println("Confidence: " + report.getConfidenceLevel());
         }
-    }
 
+        RecommendationReport report = analytics.generateRecommendationReport();
+
+        System.out.println("\n---- Focus Areas (Weak Performance) ----");
+
+        if (report.getWeakPerformanceTopics().isEmpty()) {
+            System.out.println("No weak performance areas detected.");
+        } else {
+            for (Recommendation rec : report.getWeakPerformanceTopics()) {
+                System.out.println("\nTopic: " + rec.getTopic());
+                for (String reason : rec.getReasons()) {
+                    System.out.println("- " + reason);
+                }
+            }
+        }
+
+        System.out.print("\n---- Exploration Areas (Low Exposure) ----");
+
+        if (report.getExplorationTopics().isEmpty()) {
+            System.out.println("All topics sufficiently explored.");
+        } else {
+            for (Recommendation rec : report.getExplorationTopics()) {
+                System.out.println("\nTopic: " + rec.getTopic());
+                for (String reason : rec.getReasons()) {
+                    System.out.println("- " + reason);
+                }
+            }
+            System.out.println("\n");
+        }
+    }
 }

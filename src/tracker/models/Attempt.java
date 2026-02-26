@@ -1,33 +1,37 @@
 package tracker.models;
 
-public class Problem {
-    private int id;
-    private String title;
+import java.time.LocalDateTime;
+
+public class Attempt {
+    private int attemptId;
+    private String problemTitle;
     private String platform;
     private String topic;
     private String difficulty;
     private int timeTaken;
     private boolean solved;
     private String notes;
+    private LocalDateTime timestamp;
 
-    public Problem(int id,String title,String platform,String topic,String difficulty,int timeTaken,boolean solved,String notes){
-        this.id = id;
-        this.title = title;
+    public Attempt(int attemptId, String problemTitle, String platform, String topic, String difficulty, int timeTaken, boolean solved, String notes, LocalDateTime timestamp){
+        this.attemptId = attemptId;
+        this.problemTitle = problemTitle;
         this.platform = platform;
         this.topic = topic;
         this.difficulty = difficulty;
         this.timeTaken = timeTaken;    //time taken in minutes
         this.solved = solved;
         this.notes = notes;
+        this.timestamp=timestamp;
     }
 
     //-----GETTERS-----
 
-    public int getId(){
-        return id;
+    public int getAttemptId(){
+        return attemptId;
     }
-    public String getTitle(){
-        return title;
+    public String getProblemTitle(){
+        return problemTitle;
     }
     public String getPlatform(){
         return platform;
@@ -60,26 +64,12 @@ public class Problem {
     // ===== Convert to File Format =====
 
     public String toFileFormat() {
-        return id + "|" +
-                title + "|" +
-                platform + "|" +
-                topic + "|" +
-                difficulty + "|" +
-                timeTaken + "|" +
-                solved + "|" +
-                notes;
+        return attemptId + "|" + problemTitle + "|" + platform + "|" + topic + "|" + difficulty + "|" + timeTaken + "|" + solved + "|" + notes + "|" +timestamp.toString();
     }
 
     //convert to file
     @Override
     public String toString() {
-        return "ID: " + id +
-                ", Title: " + title +
-                ", Platform: " + platform +
-                ", Topic: " + topic +
-                ", Difficulty: " + difficulty +
-                ", Time: " + timeTaken + " mins" +
-                ", Solved: " + solved +
-                ", Notes: " + notes;
+        return "ID: " + attemptId + ", Title: " + problemTitle + ", Platform: " + platform + ", Topic: " + topic + ", Difficulty: " + difficulty + ", Time: " + timeTaken + " mins" + ", Solved: " + solved + ", Notes: " + notes + ", Time: " +timestamp.toString();
     }
 }

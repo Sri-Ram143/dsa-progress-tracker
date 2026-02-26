@@ -1,24 +1,24 @@
 package tracker.analytics;
 
 import java.util.*;
-import tracker.models.Problem;
+import tracker.models.Attempt;
 
 public class AnalyticsEngine {
-    private List<Problem> problems;
+    private List<Attempt> attempts;
     private static final int Under_Explored_Threshold=3;
     private static final int Mature_Threshold=3;
-    public AnalyticsEngine(List<Problem> problems){
-        this.problems=problems;
+    public AnalyticsEngine(List<Attempt> attempts){
+        this.attempts = attempts;
     }
 
     public int getTotalProblems(){
-        return problems.size();
+        return attempts.size();
     }
 
     public int getTotalSolved(){
         int count=0;
-        for(Problem p:problems){
-            if(p.isSolved()){
+        for(Attempt a: attempts){
+            if(a.isSolved()){
                 count++;
             }
         }
@@ -26,28 +26,28 @@ public class AnalyticsEngine {
     }
 
     public double getAccuracy(){
-        if(problems.isEmpty()){
+        if(attempts.isEmpty()){
             return 0;
         }
-        return (getTotalSolved()*100.0)/problems.size();
+        return (getTotalSolved()*100.0)/ attempts.size();
     }
 
     public double getAverageTime(){
-        if(problems.isEmpty()){
+        if(attempts.isEmpty()){
             return 0;
         }
         int totalTime=0;
-        for(Problem p:problems){
-            totalTime+=p.getTimeTaken();
+        for(Attempt a: attempts){
+            totalTime+=a.getTimeTaken();
         }
-        return totalTime*1.0/problems.size();
+        return totalTime*1.0/ attempts.size();
     }
 
     public Map<String, Integer> getTopicDistribution() {
 
         Map<String, Integer> topicMap = new HashMap<>();
 
-        for (Problem p : problems) {
+        for (Attempt p : attempts) {
             String topic = p.getTopic();
             topicMap.put(topic, topicMap.getOrDefault(topic, 0) + 1);
         }
@@ -59,7 +59,7 @@ public class AnalyticsEngine {
 
         Map<String, Integer> countMap = new HashMap<>();
 
-        for (Problem p : problems) {
+        for (Attempt p : attempts) {
             String topic = p.getTopic();
             countMap.put(topic,countMap.getOrDefault(topic, 0) + 1);
         }
@@ -72,7 +72,7 @@ public class AnalyticsEngine {
         Map<String, Integer> solvedMap = new HashMap<>();
         Map<String, Integer> totalMap = new HashMap<>();
 
-        for (Problem p : problems) {
+        for (Attempt p : attempts) {
             String topic = p.getTopic();
             totalMap.put(topic,totalMap.getOrDefault(topic, 0) + 1);
             if (p.isSolved()) {
@@ -117,7 +117,7 @@ public class AnalyticsEngine {
         Map<String, Integer> totalTimeMap = new HashMap<>();
         Map<String, Integer> countMap = new HashMap<>();
 
-        for (Problem p : problems) {
+        for (Attempt p : attempts) {
 
             String topic = p.getTopic();
 
@@ -163,5 +163,45 @@ public class AnalyticsEngine {
         }
 
         return reports;
+    }
+
+    public RecommendationReport generateRecommendationReport() {
+
+        RecommendationReport report = new RecommendationReport();
+
+        Map<String, Integer> attempts = getTopicAttemptCount();
+        Map<String, Double> accuracy = getAccuracyPerTopic();
+        Map<String, Double> avgTime = getAverageTimePerTopic();
+
+        double overallAvgTime = getAverageTime();
+
+        for (String topic : attempts.keySet()) {
+
+            int topicAttempts = attempts.get(topic);
+            double topicAccuracy = accuracy.get(topic);
+            double topicAvgTime = avgTime.get(topic);
+
+            Recommendation recommendation = new Recommendation(topic);
+
+            if (topicAttempts < 3) {
+                recommendation.addReason("Low Exposure (<3 attempts)");
+                report.addExplorationTopic(recommendation);
+                continue;
+            }
+
+            if (topicAccuracy < 60) {
+                recommendation.addReason("Low Accuracy (<60%)");
+            }
+
+            if (topicAvgTime > overallAvgTime) {
+                recommendation.addReason("Slow Performance (Above overall avg)");
+            }
+
+            if (!recommendation.getReasons().isEmpty()) {
+                report.addWeakTopic(recommendation);
+            }
+        }
+
+        return report;
     }
 }

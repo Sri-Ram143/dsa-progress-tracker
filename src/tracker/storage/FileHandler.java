@@ -1,16 +1,17 @@
 package tracker.storage;
 
-import tracker.models.Problem;
+import tracker.models.Attempt;
 import java.util.*;
 import java.io.*;
+import java.time.LocalDateTime;
 
 public class FileHandler {
     private static final String FILE_NAME="problems.txt";
 
-    public static void saveToFile(List<Problem> problems){
+    public static void saveAttemptsToFile(List<Attempt> attempts){
         try(BufferedWriter writer=new BufferedWriter(new FileWriter(FILE_NAME))){
-            for(Problem p:problems){
-                writer.write(p.toFileFormat());
+            for(Attempt a: attempts){
+                writer.write(a.toFileFormat());
                 writer.newLine();
             }
         }
@@ -19,11 +20,11 @@ public class FileHandler {
         }
     }
 
-    public static List<Problem> loadFromFile(){
-        List<Problem> problems=new ArrayList<>();
+    public static List<Attempt> loadAttemptsFromFile(){
+        List<Attempt> attempts =new ArrayList<>();
         File file=new File(FILE_NAME);
         if(!file.exists()){
-            return problems;
+            return attempts;
         }
         try(BufferedReader reader=new BufferedReader(new FileReader(FILE_NAME))){
             String line;
@@ -37,14 +38,15 @@ public class FileHandler {
                 int timeTaken = Integer.parseInt(parts[5]);
                 boolean solved = Boolean.parseBoolean(parts[6]);
                 String notes = parts[7];
-
-                Problem problem = new Problem(id,title,platform,topic,difficulty,timeTaken,solved,notes);
-                problems.add(problem);
+                String timestampStr=parts[8];
+                LocalDateTime timestamp=LocalDateTime.parse(timestampStr);
+                Attempt attempt = new Attempt(id,title,platform,topic,difficulty,timeTaken,solved,notes,timestamp);
+                attempts.add(attempt);
             }
         }
         catch(Exception e){
-            System.out.println("Error leading file: "+e.getMessage());
+            System.out.println("Error loading file: "+e.getMessage());
         }
-        return problems;
+        return attempts;
     }
 }
