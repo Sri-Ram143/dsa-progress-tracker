@@ -2,6 +2,8 @@ package tracker.storage;
 
 import java.util.*;
 import tracker.models.Attempt;
+import tracker.models.Difficulty;
+
 import java.time.LocalDateTime;
 
 public class AttemptRepository {
@@ -9,9 +11,12 @@ public class AttemptRepository {
     public AttemptRepository(){
         attempts=FileHandler.loadAttemptsFromFile();
     }
-    public int recordAttempt(String title,String platform,String topic,String difficulty,int timeTaken,boolean solved,String notes){
+    public int recordAttempt(String title,String platform,String topic,String difficultyInput,int timeTaken,boolean solved,String notes){
         int nextId = generateNextAttemptId();
         LocalDateTime timestamp=LocalDateTime.now();
+        topic = normalizeStorage(topic);
+        platform = normalizeStorage(platform);
+        Difficulty difficulty= Difficulty.fromString(difficultyInput);
         Attempt attempt = new Attempt(nextId,title,platform,topic,difficulty,timeTaken,solved,notes,timestamp);
         attempts.add(attempt);
         FileHandler.saveAttemptsToFile(attempts);
@@ -19,8 +24,21 @@ public class AttemptRepository {
         return nextId;
     }
 
-    public boolean deleteByTopic(String topic){
-        boolean removed = attempts.removeIf(a -> a.getTopic().equalsIgnoreCase(topic));
+    private String normalizeStorage(String input) {
+        return input.trim().replaceAll("\\s+", " ");
+    }
+
+    public boolean deleteById(int id){
+        boolean removed=false;
+        Iterator<Attempt> iterator = attempts.iterator();
+        while (iterator.hasNext()) {
+            Attempt attempt = iterator.next();
+            if(attempt.getAttemptId()==id){
+                iterator.remove();
+                removed=true;
+                break;
+            }
+        }
         if(removed){
             FileHandler.saveAttemptsToFile(attempts);
         }
@@ -54,4 +72,77 @@ public class AttemptRepository {
         return null;
     }
 
+    public boolean updateDifficulty(int id,Difficulty newDifficulty){
+        Attempt attempt=findById(id);
+
+        if(attempt==null){
+            return false;
+        }
+
+        attempt.setDifficulty(newDifficulty);
+        FileHandler.saveAttemptsToFile(attempts);
+
+        return true;
+    }
+
+    public boolean updateTimeTaken(int id,int newTime){
+        Attempt attempt=findById(id);
+
+        if(attempt==null){
+            return false;
+        }
+
+        attempt.setTimeTaken(newTime);
+        FileHandler.saveAttemptsToFile(attempts);
+
+        return true;
+    }
+
+    public boolean updateSolvedStatus(int id,boolean solved){
+        Attempt attempt=findById(id);
+
+        if(attempt==null){
+            return false;
+        }
+
+        attempt.setSolved(solved);
+        FileHandler.saveAttemptsToFile(attempts);
+
+        return true;
+    }
+
+    public boolean updateNotes(int id,String notes){
+        Attempt attempt=findById(id);
+
+        if(attempt==null){
+            return false;
+        }
+
+        attempt.setNotes(notes);
+        FileHandler.saveAttemptsToFile(attempts);
+
+        return true;
+    }
+
+    private String normalize(String input) {
+        return input.trim().replaceAll("\\s+", " ").toLowerCase();
+    }
+
+    public List<Attempt> findByTitle(String title){
+        List<Attempt> matched=new ArrayList<>();
+
+        if(title==null){
+            return matched;
+        }
+
+        String normalOutput=normalize(title);
+
+        for(Attempt attempt:attempts){
+            if(normalize(attempt.getProblemTitle()).trim().equalsIgnoreCase(normalOutput)){
+                matched.add(attempt);
+            }
+        }
+
+        return matched;
+    }
 }

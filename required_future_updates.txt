@@ -1,0 +1,5 @@
+A) Improvement Velocity (problem-level)
+B) Struggle Index (topic-level)
+C) Recovery Rate
+D) Stability Score
+E) Difficulty Efficiency

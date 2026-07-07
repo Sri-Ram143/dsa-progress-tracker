@@ -7,13 +7,13 @@ public class Attempt {
     private String problemTitle;
     private String platform;
     private String topic;
-    private String difficulty;
+    private Difficulty difficulty;
     private int timeTaken;
     private boolean solved;
     private String notes;
     private LocalDateTime timestamp;
 
-    public Attempt(int attemptId, String problemTitle, String platform, String topic, String difficulty, int timeTaken, boolean solved, String notes, LocalDateTime timestamp){
+    public Attempt(int attemptId, String problemTitle, String platform, String topic, Difficulty difficulty, int timeTaken, boolean solved, String notes, LocalDateTime timestamp){
         this.attemptId = attemptId;
         this.problemTitle = problemTitle;
         this.platform = platform;
@@ -39,7 +39,7 @@ public class Attempt {
     public String getTopic(){
         return topic;
     }
-    public String getDifficulty(){
+    public Difficulty getDifficulty(){
         return difficulty;
     }
     public int getTimeTaken(){
@@ -51,12 +51,20 @@ public class Attempt {
     public String getNotes(){
         return notes;
     }
+    public LocalDateTime getTimestamp(){return timestamp;}
 
-    //-----controlled setters-----
+    public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public void setTimeTaken(int timeTaken) {
+        this.timeTaken = timeTaken;
+    }
 
     public void setSolved(boolean solved) {
         this.solved = solved;
     }
+
     public void setNotes(String notes) {
         this.notes = notes;
     }
@@ -64,12 +72,12 @@ public class Attempt {
     // ===== Convert to File Format =====
 
     public String toFileFormat() {
-        return attemptId + "|" + problemTitle + "|" + platform + "|" + topic + "|" + difficulty + "|" + timeTaken + "|" + solved + "|" + notes + "|" +timestamp.toString();
+        return attemptId + "|" + problemTitle + "|" + platform + "|" + topic + "|" + difficulty.name() + "|" + timeTaken + "|" + solved + "|" + notes + "|" +timestamp.toString();
     }
 
     //convert to file
     @Override
     public String toString() {
-        return "ID: " + attemptId + ", Title: " + problemTitle + ", Platform: " + platform + ", Topic: " + topic + ", Difficulty: " + difficulty + ", Time: " + timeTaken + " mins" + ", Solved: " + solved + ", Notes: " + notes + ", Time: " +timestamp.toString();
+        return "ID: " + attemptId + ", Title: " + problemTitle + ", Platform: " + platform + ", Topic: " + topic + ", Difficulty: " + difficulty.getlabel() + ", Time: " + timeTaken + " mins" + ", Solved: " + solved + ", Notes: " + notes + ", Time: " +timestamp.toString();
     }
 }
