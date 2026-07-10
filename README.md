@@ -8,6 +8,7 @@ This project is built as a learning-focused portfolio project. It starts with a 
 
 - Add coding problem attempts with title, platform, topic, difficulty, time taken, solved status, and notes
 - View all recorded attempts
+- Search and filter attempts by title, topic, platform, difficulty, or solved status
 - Update attempt details such as difficulty, time taken, solved status, and notes
 - Delete attempts by selecting the correct attempt ID
 - Store attempts in a local text file
@@ -80,7 +81,8 @@ java -cp out tracker.cli.Main
 3. Delete Attempt
 4. View Analytics
 5. Update Attempt
-6. Exit
+6. Search/Filter Attempts
+7. Exit
 ```
 
 ## Current Analytics Logic
@@ -107,7 +109,6 @@ This project is being developed step by step to practice:
 ## Planned Improvements
 
 - Improve input validation and error handling
-- Add search and filter options
 - Track current streak and weekly progress
 - Export analytics reports
 - Move from text-file storage to CSV, JSON, or SQLite

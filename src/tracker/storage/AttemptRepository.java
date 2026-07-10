@@ -145,4 +145,64 @@ public class AttemptRepository {
 
         return matched;
     }
+
+    public List<Attempt> findByTopic(String topic) {
+        List<Attempt> matched = new ArrayList<>();
+
+        if (topic == null) {
+            return matched;
+        }
+
+        String normalizedTopic = normalize(topic);
+
+        for (Attempt attempt : attempts) {
+            if (normalize(attempt.getTopic()).equals(normalizedTopic)) {
+                matched.add(attempt);
+            }
+        }
+
+        return matched;
+    }
+
+    public List<Attempt> findByPlatform(String platform) {
+        List<Attempt> matched = new ArrayList<>();
+
+        if (platform == null) {
+            return matched;
+        }
+
+        String normalizedPlatform = normalize(platform);
+
+        for (Attempt attempt : attempts) {
+            if (normalize(attempt.getPlatform()).equals(normalizedPlatform)) {
+                matched.add(attempt);
+            }
+        }
+
+        return matched;
+    }
+
+    public List<Attempt> findByDifficulty(Difficulty difficulty) {
+        List<Attempt> matched = new ArrayList<>();
+
+        for (Attempt attempt : attempts) {
+            if (attempt.getDifficulty() == difficulty) {
+                matched.add(attempt);
+            }
+        }
+
+        return matched;
+    }
+
+    public List<Attempt> findBySolvedStatus(boolean solved) {
+        List<Attempt> matched = new ArrayList<>();
+
+        for (Attempt attempt : attempts) {
+            if (attempt.isSolved() == solved) {
+                matched.add(attempt);
+            }
+        }
+
+        return matched;
+    }
 }

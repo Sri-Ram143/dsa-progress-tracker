@@ -18,8 +18,8 @@ public class Main {
         repository=new AttemptRepository();
         while (true) {
             System.out.println("----MENU----");
-            System.out.println("1.Add Problem\n2.View Attempts\n3.Delete Attempt\n4.View Analytics\n5.Update Attempt\n6.Exit\n");
-            int choice = readIntInRange("Enter your choice: ", 1, 6);
+            System.out.println("1.Add Problem\n2.View Attempts\n3.Delete Attempt\n4.View Analytics\n5.Update Attempt\n6.Search/Filter Attempts\n7.Exit\n");
+            int choice = readIntInRange("Enter your choice: ", 1, 7);
             switch (choice) {
                 case 1:
                     recordAttempt();
@@ -37,6 +37,9 @@ public class Main {
                     updateAttempt();
                     break;
                 case 6:
+                    searchAttempts();
+                    break;
+                case 7:
                     System.out.println("exiting program!");
                     return;
             }
@@ -47,9 +50,7 @@ public class Main {
             System.out.println("no problems logged yet!");
             return;
         }
-        for(Attempt attempt : repository.getAllAttempts()){
-            System.out.println(attempt);
-        }
+        displayAttempts(repository.getAllAttempts());
     }
 
     private static void recordAttempt(){
@@ -231,6 +232,72 @@ public class Main {
             System.out.println("Attempt updated successfully.");
         } else {
             System.out.println("Update failed.");
+        }
+    }
+
+    private static void searchAttempts() {
+        if (repository.isEmpty()) {
+            System.out.println("No attempts available to search.");
+            return;
+        }
+
+        System.out.println("\n---- SEARCH / FILTER ----");
+        System.out.println("1. Search by Title");
+        System.out.println("2. Filter by Topic");
+        System.out.println("3. Filter by Platform");
+        System.out.println("4. Filter by Difficulty");
+        System.out.println("5. Filter by Solved Status");
+        System.out.println("6. Back to Main Menu");
+
+        int choice = readIntInRange("Enter your choice: ", 1, 6);
+        List<Attempt> results;
+
+        switch (choice) {
+            case 1:
+                String title = readRequiredText("Enter title: ");
+                results = repository.findByTitle(title);
+                break;
+
+            case 2:
+                String topic = readRequiredText("Enter topic: ");
+                results = repository.findByTopic(topic);
+                break;
+
+            case 3:
+                String platform = readRequiredText("Enter platform: ");
+                results = repository.findByPlatform(platform);
+                break;
+
+            case 4:
+                Difficulty difficulty = readDifficulty("Enter difficulty (EASY/MEDIUM/HARD): ");
+                results = repository.findByDifficulty(difficulty);
+                break;
+
+            case 5:
+                boolean solved = readBoolean("Solved status (true/false): ");
+                results = repository.findBySolvedStatus(solved);
+                break;
+
+            case 6:
+                System.out.println("Returning to main menu.");
+                return;
+
+            default:
+                results = new ArrayList<>();
+        }
+
+        if (results.isEmpty()) {
+            System.out.println("No matching attempts found.");
+            return;
+        }
+
+        System.out.println("\nMatching Attempts:");
+        displayAttempts(results);
+    }
+
+    private static void displayAttempts(List<Attempt> attempts) {
+        for (Attempt attempt : attempts) {
+            System.out.println(attempt);
         }
     }
 
