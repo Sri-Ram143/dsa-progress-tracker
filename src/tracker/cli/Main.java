@@ -11,17 +11,15 @@ import tracker.analytics.TopicReport;
 import tracker.analytics.RecommendationReport;
 
 public class Main {
-    private static Scanner in=new Scanner(System.in);
+    private static final Scanner in = new Scanner(System.in);
     private static AttemptRepository repository;
+
     public static void main(String[] args) {
         repository=new AttemptRepository();
         while (true) {
             System.out.println("----MENU----");
             System.out.println("1.Add Problem\n2.View Attempts\n3.Delete Attempt\n4.View Analytics\n5.Update Attempt\n6.Exit\n");
-            int choice;
-            System.out.print("Enter your choice: ");
-            choice = in.nextInt();
-            in.nextLine();
+            int choice = readIntInRange("Enter your choice: ", 1, 6);
             switch (choice) {
                 case 1:
                     recordAttempt();
@@ -41,9 +39,6 @@ public class Main {
                 case 6:
                     System.out.println("exiting program!");
                     return;
-                default:
-                    System.out.println("invalid choice. Try again");
-                    break;
             }
         }
     }
@@ -58,35 +53,22 @@ public class Main {
     }
 
     private static void recordAttempt(){
-        System.out.println("Enter Title: ");
-        String title=in.nextLine();
+        String title = readRequiredText("Enter Title: ");
 
-        System.out.println("Enter Platform: ");
-        String platform=in.nextLine();
+        String platform = readRequiredText("Enter Platform: ");
 
-        System.out.println("Enter Topic: ");
-        String topic=in.nextLine();
+        String topic = readRequiredText("Enter Topic: ");
 
-        System.out.println("Enter Difficulty: ");
-        String difficulty=in.nextLine();
-        try {
-            Difficulty.fromString(difficulty);
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            return;
-        }
+        Difficulty difficulty = readDifficulty("Enter Difficulty (EASY/MEDIUM/HARD): ");
 
-        System.out.println("Enter Time Taken(in minutes): ");
-        int timeTaken=in.nextInt();
+        int timeTaken = readPositiveInt("Enter Time Taken (in minutes): ");
 
-        System.out.println("Solved(True/false): ");
-        boolean solved=in.nextBoolean();
-        in.nextLine();
+        boolean solved = readBoolean("Solved (true/false): ");
 
-        System.out.println("Enter Notes: ");
-        String notes=in.nextLine();
+        System.out.print("Enter Notes: ");
+        String notes = in.nextLine().trim();
 
-        int attemptId=repository.recordAttempt(title,platform,topic,difficulty,timeTaken,solved,notes);
+        int attemptId=repository.recordAttempt(title,platform,topic,difficulty.name(),timeTaken,solved,notes);
         System.out.println("Attempt recorded with ID: " + attemptId);
     }
 
@@ -95,54 +77,15 @@ public class Main {
             System.out.println("no problems to delete!");
             return;
         }
-        System.out.print("Enter title of the attempt: ");
-        String topic=in.nextLine();
-        List<Attempt> matched=repository.findByTitle(topic);
+        String title = readRequiredText("Enter title of the attempt: ");
+        List<Attempt> matched=repository.findByTitle(title);
 
         if (matched.isEmpty()) {
             System.out.println("No attempts found for this title.");
             return;
         }
 
-        Attempt selectedAttempt = null;
-
-        if (matched.size() == 1) {
-
-            selectedAttempt = matched.get(0);
-            System.out.println("Only one attempt found.");
-            System.out.println("Automatically selected Attempt ID: " + selectedAttempt.getAttemptId());
-
-        } else {
-
-            System.out.println("\nMatching Attempts:");
-
-            for (Attempt attempt : matched) {
-                System.out.println("ID: " + attempt.getAttemptId() +" | Time: " + attempt.getTimeTaken() + " mins" + " | Solved: " + attempt.isSolved() + " | Date: " + attempt.getTimestamp());
-            }
-
-            while (true) {
-
-                System.out.print("Enter Attempt ID to delete: ");
-                int id = in.nextInt();
-                in.nextLine();
-
-                boolean foundInList = false;
-
-                for (Attempt attempt : matched) {
-                    if (attempt.getAttemptId() == id) {
-                        selectedAttempt = attempt;
-                        foundInList = true;
-                        break;
-                    }
-                }
-
-                if (foundInList) {
-                    break;
-                } else {
-                    System.out.println("Invalid selection. Choose from displayed IDs.");
-                }
-            }
-        }
+        Attempt selectedAttempt = selectAttempt(matched, "delete");
 
         int id = selectedAttempt.getAttemptId();
 
@@ -229,8 +172,7 @@ public class Main {
             return;
         }
 
-        System.out.print("Enter problem title: ");
-        String title = in.nextLine();
+        String title = readRequiredText("Enter problem title: ");
 
         List<Attempt> matched = repository.findByTitle(title);
 
@@ -239,45 +181,7 @@ public class Main {
             return;
         }
 
-        Attempt selectedAttempt = null;
-
-        if (matched.size() == 1) {
-
-            selectedAttempt = matched.get(0);
-            System.out.println("Only one attempt found.");
-            System.out.println("Automatically selected Attempt ID: " + selectedAttempt.getAttemptId());
-
-        } else {
-
-            System.out.println("\nMatching Attempts:");
-
-            for (Attempt attempt : matched) {
-                System.out.println("ID: " + attempt.getAttemptId() +" | Time: " + attempt.getTimeTaken() + " mins" + " | Solved: " + attempt.isSolved() + " | Date: " + attempt.getTimestamp());
-            }
-
-            while (true) {
-
-                System.out.print("Enter Attempt ID to update: ");
-                int id = in.nextInt();
-                in.nextLine();
-
-                boolean foundInList = false;
-
-                for (Attempt attempt : matched) {
-                    if (attempt.getAttemptId() == id) {
-                        selectedAttempt = attempt;
-                        foundInList = true;
-                        break;
-                    }
-                }
-
-                if (foundInList) {
-                    break;
-                } else {
-                    System.out.println("Invalid selection. Choose from displayed IDs.");
-                }
-            }
-        }
+        Attempt selectedAttempt = selectAttempt(matched, "update");
 
         int id = selectedAttempt.getAttemptId();
 
@@ -291,37 +195,24 @@ public class Main {
         System.out.println("4. Notes");
         System.out.println("5. Cancel");
 
-        int choice = in.nextInt();
-        in.nextLine();
+        int choice = readIntInRange("Enter your choice: ", 1, 5);
 
         boolean updated = false;
 
         switch (choice) {
 
             case 1:
-                System.out.print("Enter new Difficulty: ");
-                String difficultyInput = in.nextLine();
-                Difficulty difficulty;
-                try {
-                    difficulty = Difficulty.fromString(difficultyInput);
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
-                    return;
-                }
+                Difficulty difficulty = readDifficulty("Enter new Difficulty (EASY/MEDIUM/HARD): ");
                 updated = repository.updateDifficulty(id, difficulty);
                 break;
 
             case 2:
-                System.out.print("Enter new Time Taken: ");
-                int time = in.nextInt();
-                in.nextLine();
+                int time = readPositiveInt("Enter new Time Taken: ");
                 updated = repository.updateTimeTaken(id, time);
                 break;
 
             case 3:
-                System.out.print("Enter new Solved Status (true/false): ");
-                boolean solved = in.nextBoolean();
-                in.nextLine();
+                boolean solved = readBoolean("Enter new Solved Status (true/false): ");
                 updated = repository.updateSolvedStatus(id, solved);
                 break;
 
@@ -334,16 +225,120 @@ public class Main {
             case 5:
                 System.out.println("Update cancelled.");
                 return;
-
-            default:
-                System.out.println("Invalid choice.");
-                return;
         }
 
         if (updated) {
             System.out.println("Attempt updated successfully.");
         } else {
             System.out.println("Update failed.");
+        }
+    }
+
+    private static String readRequiredText(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = in.nextLine().trim();
+
+            if (!input.isEmpty()) {
+                return input;
+            }
+
+            System.out.println("This field cannot be empty. Please try again.");
+        }
+    }
+
+    private static int readPositiveInt(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = in.nextLine().trim();
+
+            try {
+                int value = Integer.parseInt(input);
+
+                if (value > 0) {
+                    return value;
+                }
+
+                System.out.println("Please enter a number greater than 0.");
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid whole number.");
+            }
+        }
+    }
+
+    private static int readIntInRange(String prompt, int min, int max) {
+        while (true) {
+            System.out.print(prompt);
+            String input = in.nextLine().trim();
+
+            try {
+                int value = Integer.parseInt(input);
+
+                if (value >= min && value <= max) {
+                    return value;
+                }
+
+                System.out.println("Please enter a number between " + min + " and " + max + ".");
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid whole number.");
+            }
+        }
+    }
+
+    private static boolean readBoolean(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = in.nextLine().trim().toLowerCase();
+
+            if (input.equals("true") || input.equals("yes") || input.equals("y")) {
+                return true;
+            }
+
+            if (input.equals("false") || input.equals("no") || input.equals("n")) {
+                return false;
+            }
+
+            System.out.println("Please enter true/false or yes/no.");
+        }
+    }
+
+    private static Difficulty readDifficulty(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = in.nextLine();
+
+            try {
+                return Difficulty.fromString(input);
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private static Attempt selectAttempt(List<Attempt> matched, String action) {
+        if (matched.size() == 1) {
+            Attempt selectedAttempt = matched.get(0);
+            System.out.println("Only one attempt found.");
+            System.out.println("Automatically selected Attempt ID: " + selectedAttempt.getAttemptId());
+            return selectedAttempt;
+        }
+
+        System.out.println("\nMatching Attempts:");
+
+        for (Attempt attempt : matched) {
+            System.out.println("ID: " + attempt.getAttemptId() +" | Time: " + attempt.getTimeTaken() + " mins" + " | Solved: " + attempt.isSolved() + " | Date: " + attempt.getTimestamp());
+        }
+
+        while (true) {
+            int id = readPositiveInt("Enter Attempt ID to " + action + ": ");
+
+            for (Attempt attempt : matched) {
+                if (attempt.getAttemptId() == id) {
+                    return attempt;
+                }
+            }
+
+            System.out.println("Invalid selection. Choose from displayed IDs.");
         }
     }
 }
