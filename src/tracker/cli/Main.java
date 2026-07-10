@@ -119,6 +119,14 @@ public class Main {
 
         System.out.println("Average Time: " + String.format("%.2f",analytics.getAverageTime()) + " mins");
 
+        System.out.println("\n---- Progress Summary ----");
+
+        System.out.println("Current Streak: " + analytics.getCurrentStreak() + " day(s)");
+
+        System.out.println("Longest Streak: " + analytics.getLongestStreak() + " day(s)");
+
+        System.out.println("Solved This Week: " + analytics.getSolvedThisWeek());
+
         System.out.println("\nTopic Distribution:");
 
         analytics.getTopicDistribution().forEach((topic, count) -> System.out.println(topic + " : " + count));

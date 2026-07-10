@@ -14,7 +14,8 @@ public class AttemptRepository {
     public int recordAttempt(String title,String platform,String topic,String difficultyInput,int timeTaken,boolean solved,String notes){
         int nextId = generateNextAttemptId();
         LocalDateTime timestamp=LocalDateTime.now();
-        topic = normalizeStorage(topic);
+        title = normalizeStorage(title);
+        topic = normalizeTopicName(topic);
         platform = normalizeStorage(platform);
         Difficulty difficulty= Difficulty.fromString(difficultyInput);
         Attempt attempt = new Attempt(nextId,title,platform,topic,difficulty,timeTaken,solved,notes,timestamp);
@@ -26,6 +27,25 @@ public class AttemptRepository {
 
     private String normalizeStorage(String input) {
         return input.trim().replaceAll("\\s+", " ");
+    }
+
+    private String normalizeTopicName(String input) {
+        String normalized = normalizeStorage(input).toLowerCase();
+        String[] words = normalized.split(" ");
+        StringBuilder topicName = new StringBuilder();
+
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                if (topicName.length() > 0) {
+                    topicName.append(" ");
+                }
+
+                topicName.append(Character.toUpperCase(word.charAt(0)));
+                topicName.append(word.substring(1));
+            }
+        }
+
+        return topicName.toString();
     }
 
     public boolean deleteById(int id){

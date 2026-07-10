@@ -39,6 +39,24 @@ public class Attempt {
     public String getTopic(){
         return topic;
     }
+    public String getDisplayTopic(){
+        String normalized = topic.trim().replaceAll("\\s+", " ").toLowerCase();
+        String[] words = normalized.split(" ");
+        StringBuilder displayTopic = new StringBuilder();
+
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                if (displayTopic.length() > 0) {
+                    displayTopic.append(" ");
+                }
+
+                displayTopic.append(Character.toUpperCase(word.charAt(0)));
+                displayTopic.append(word.substring(1));
+            }
+        }
+
+        return displayTopic.toString();
+    }
     public Difficulty getDifficulty(){
         return difficulty;
     }
@@ -78,6 +96,6 @@ public class Attempt {
     //convert to file
     @Override
     public String toString() {
-        return "ID: " + attemptId + ", Title: " + problemTitle + ", Platform: " + platform + ", Topic: " + topic + ", Difficulty: " + difficulty.getlabel() + ", Time: " + timeTaken + " mins" + ", Solved: " + solved + ", Notes: " + notes + ", Time: " +timestamp.toString();
+        return "ID: " + attemptId + ", Title: " + problemTitle + ", Platform: " + platform + ", Topic: " + getDisplayTopic() + ", Difficulty: " + difficulty.getlabel() + ", Time: " + timeTaken + " mins" + ", Solved: " + solved + ", Notes: " + notes + ", Time: " +timestamp.toString();
     }
 }

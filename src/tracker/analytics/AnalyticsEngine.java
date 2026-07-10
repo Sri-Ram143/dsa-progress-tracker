@@ -1,5 +1,8 @@
 package tracker.analytics;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import tracker.models.Attempt;
 
@@ -43,12 +46,83 @@ public class AnalyticsEngine {
         return totalTime*1.0/ attempts.size();
     }
 
+    public int getCurrentStreak() {
+        TreeSet<LocalDate> practiceDates = getPracticeDates();
+
+        if (practiceDates.isEmpty()) {
+            return 0;
+        }
+
+        int streak = 1;
+        LocalDate currentDate = practiceDates.last();
+
+        while (practiceDates.contains(currentDate.minusDays(1))) {
+            streak++;
+            currentDate = currentDate.minusDays(1);
+        }
+
+        return streak;
+    }
+
+    public int getLongestStreak() {
+        TreeSet<LocalDate> practiceDates = getPracticeDates();
+
+        if (practiceDates.isEmpty()) {
+            return 0;
+        }
+
+        int longestStreak = 1;
+        int currentStreak = 1;
+        LocalDate previousDate = null;
+
+        for (LocalDate date : practiceDates) {
+            if (previousDate != null && date.equals(previousDate.plusDays(1))) {
+                currentStreak++;
+            } else {
+                currentStreak = 1;
+            }
+
+            if (currentStreak > longestStreak) {
+                longestStreak = currentStreak;
+            }
+
+            previousDate = date;
+        }
+
+        return longestStreak;
+    }
+
+    public int getSolvedThisWeek() {
+        LocalDate startOfWeek = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate endOfWeek = startOfWeek.plusDays(6);
+        int count = 0;
+
+        for (Attempt attempt : attempts) {
+            LocalDate attemptDate = attempt.getTimestamp().toLocalDate();
+
+            if (attempt.isSolved() && !attemptDate.isBefore(startOfWeek) && !attemptDate.isAfter(endOfWeek)) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private TreeSet<LocalDate> getPracticeDates() {
+        TreeSet<LocalDate> practiceDates = new TreeSet<>();
+
+        for (Attempt attempt : attempts) {
+            practiceDates.add(attempt.getTimestamp().toLocalDate());
+        }
+        return practiceDates;
+    }
+
     public Map<String, Integer> getTopicDistribution() {
 
         Map<String, Integer> topicMap = new HashMap<>();
 
         for (Attempt p : attempts) {
-            String topic = p.getTopic();
+            String topic = normalizeTopicName(p.getTopic());
             topicMap.put(topic, topicMap.getOrDefault(topic, 0) + 1);
         }
 
@@ -60,7 +134,7 @@ public class AnalyticsEngine {
         Map<String, Integer> countMap = new HashMap<>();
 
         for (Attempt p : attempts) {
-            String topic = p.getTopic();
+            String topic = normalizeTopicName(p.getTopic());
             countMap.put(topic,countMap.getOrDefault(topic, 0) + 1);
         }
 
@@ -73,7 +147,7 @@ public class AnalyticsEngine {
         Map<String, Integer> totalMap = new HashMap<>();
 
         for (Attempt p : attempts) {
-            String topic = p.getTopic();
+            String topic = normalizeTopicName(p.getTopic());
             totalMap.put(topic,totalMap.getOrDefault(topic, 0) + 1);
             if (p.isSolved()) {
                 solvedMap.put(topic,solvedMap.getOrDefault(topic, 0) + 1);
@@ -119,7 +193,7 @@ public class AnalyticsEngine {
 
         for (Attempt p : attempts) {
 
-            String topic = p.getTopic();
+            String topic = normalizeTopicName(p.getTopic());
 
             totalTimeMap.put(topic,
                     totalTimeMap.getOrDefault(topic, 0) + p.getTimeTaken());
@@ -203,5 +277,24 @@ public class AnalyticsEngine {
         }
 
         return report;
+    }
+
+    private String normalizeTopicName(String input) {
+        String normalized = input.trim().replaceAll("\\s+", " ").toLowerCase();
+        String[] words = normalized.split(" ");
+        StringBuilder topicName = new StringBuilder();
+
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                if (topicName.length() > 0) {
+                    topicName.append(" ");
+                }
+
+                topicName.append(Character.toUpperCase(word.charAt(0)));
+                topicName.append(word.substring(1));
+            }
+        }
+
+        return topicName.toString();
     }
 }

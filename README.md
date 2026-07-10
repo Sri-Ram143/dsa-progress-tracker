@@ -9,6 +9,7 @@ This project is built as a learning-focused portfolio project. It starts with a 
 - Add coding problem attempts with title, platform, topic, difficulty, time taken, solved status, and notes
 - View all recorded attempts
 - Search and filter attempts by title, topic, platform, difficulty, or solved status
+- Normalize topic names so casing and extra spaces do not split analytics results
 - Update attempt details such as difficulty, time taken, solved status, and notes
 - Delete attempts by selecting the correct attempt ID
 - Store attempts in a local text file
@@ -17,6 +18,9 @@ This project is built as a learning-focused portfolio project. It starts with a 
   - total solved
   - accuracy percentage
   - average solving time
+  - current practice streak
+  - longest practice streak
+  - problems solved this week
 - Generate topic-wise diagnostics:
   - attempts per topic
   - topic accuracy
@@ -93,6 +97,7 @@ The app evaluates progress using simple rules:
 - Topics with accuracy below 60% are marked as weak performance areas
 - Topics taking more than the overall average time are marked as slow performance areas
 - Each topic receives a confidence level based on attempt count
+- Streaks are calculated from unique practice dates, so multiple attempts on the same day count as one streak day
 
 ## Learning Goals
 
@@ -109,7 +114,6 @@ This project is being developed step by step to practice:
 ## Planned Improvements
 
 - Improve input validation and error handling
-- Track current streak and weekly progress
 - Export analytics reports
 - Move from text-file storage to CSV, JSON, or SQLite
 - Add unit tests for analytics logic
