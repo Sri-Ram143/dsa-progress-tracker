@@ -1,5 +1,6 @@
 ### IntelliJ IDEA ###
 out/
+target/
 codex-build-check/
 !**/src/main/**/out/
 !**/src/test/**/out/
@@ -29,3 +30,8 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Generated application reports ###
+analytics_report.txt
+analytics_report.csv
+report.csv

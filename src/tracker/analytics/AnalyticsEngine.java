@@ -7,11 +7,11 @@ import java.util.*;
 import tracker.models.Attempt;
 
 public class AnalyticsEngine {
-    private List<Attempt> attempts;
-    private static final int Under_Explored_Threshold=3;
-    private static final int Mature_Threshold=3;
+    private final List<Attempt> attempts;
+    private static final int UNDER_EXPLORED_THRESHOLD = 3;
+    private static final int MATURE_THRESHOLD = 6;
     public AnalyticsEngine(List<Attempt> attempts){
-        this.attempts = attempts;
+        this.attempts = List.copyOf(attempts);
     }
 
     public int getTotalProblems(){
@@ -53,8 +53,12 @@ public class AnalyticsEngine {
             return 0;
         }
 
-        int streak = 1;
         LocalDate currentDate = practiceDates.last();
+        if (currentDate.isBefore(LocalDate.now().minusDays(1))) {
+            return 0;
+        }
+
+        int streak = 1;
 
         while (practiceDates.contains(currentDate.minusDays(1))) {
             streak++;
@@ -119,7 +123,7 @@ public class AnalyticsEngine {
 
     public Map<String, Integer> getTopicDistribution() {
 
-        Map<String, Integer> topicMap = new HashMap<>();
+        Map<String, Integer> topicMap = new TreeMap<>();
 
         for (Attempt p : attempts) {
             String topic = normalizeTopicName(p.getTopic());
@@ -131,7 +135,7 @@ public class AnalyticsEngine {
 
     public Map<String, Integer> getTopicAttemptCount() {
 
-        Map<String, Integer> countMap = new HashMap<>();
+        Map<String, Integer> countMap = new TreeMap<>();
 
         for (Attempt p : attempts) {
             String topic = normalizeTopicName(p.getTopic());
@@ -143,8 +147,8 @@ public class AnalyticsEngine {
 
     public Map<String, Double> getAccuracyPerTopic() {
 
-        Map<String, Integer> solvedMap = new HashMap<>();
-        Map<String, Integer> totalMap = new HashMap<>();
+        Map<String, Integer> solvedMap = new TreeMap<>();
+        Map<String, Integer> totalMap = new TreeMap<>();
 
         for (Attempt p : attempts) {
             String topic = normalizeTopicName(p.getTopic());
@@ -154,7 +158,7 @@ public class AnalyticsEngine {
             }
         }
 
-        Map<String, Double> accuracyMap = new HashMap<>();
+        Map<String, Double> accuracyMap = new TreeMap<>();
 
         for (String topic : totalMap.keySet()) {
 
@@ -175,10 +179,10 @@ public class AnalyticsEngine {
 
         int attempts = attemptMap.getOrDefault(topic, 0);
 
-        if (attempts < Under_Explored_Threshold) {
+        if (attempts < UNDER_EXPLORED_THRESHOLD) {
             return "Under-Explored";
         }
-        else if (attempts <= Mature_Threshold   ) {
+        else if (attempts < MATURE_THRESHOLD) {
             return "Developing";
         }
         else {
@@ -188,8 +192,8 @@ public class AnalyticsEngine {
 
     public Map<String, Double> getAverageTimePerTopic() {
 
-        Map<String, Integer> totalTimeMap = new HashMap<>();
-        Map<String, Integer> countMap = new HashMap<>();
+        Map<String, Integer> totalTimeMap = new TreeMap<>();
+        Map<String, Integer> countMap = new TreeMap<>();
 
         for (Attempt p : attempts) {
 
@@ -202,7 +206,7 @@ public class AnalyticsEngine {
                     countMap.getOrDefault(topic, 0) + 1);
         }
 
-        Map<String, Double> averageMap = new HashMap<>();
+        Map<String, Double> averageMap = new TreeMap<>();
 
         for (String topic : totalTimeMap.keySet()) {
 

@@ -18,8 +18,8 @@ public class Main {
     public static void main(String[] args) {
         repository=new AttemptRepository();
         while (true) {
-            System.out.println("----MENU----");
-            System.out.println("1.Add Problem\n2.View Attempts\n3.Delete Attempt\n4.View Analytics\n5.Update Attempt\n6.Search/Filter Attempts\n7.Export Report\n8.Exit\n");
+            System.out.println("\n---- DSA PROGRESS TRACKER ----");
+            System.out.println("1. Add Problem\n2. View Attempts\n3. Delete Attempt\n4. View Analytics\n5. Update Attempt\n6. Search / Filter Attempts\n7. Export Report\n8. Exit\n");
             int choice = readIntInRange("Enter your choice: ", 1, 8);
             switch (choice) {
                 case 1:
@@ -41,10 +41,10 @@ public class Main {
                     searchAttempts();
                     break;
                 case 7:
-                    ExportReport();
+                    exportReport();
                     break;
                 case 8:
-                    System.out.println("exiting program!");
+                    System.out.println("Goodbye!");
                     return;
             }
         }
@@ -73,7 +73,7 @@ public class Main {
         System.out.print("Enter Notes: ");
         String notes = in.nextLine().trim();
 
-        int attemptId=repository.recordAttempt(title,platform,topic,difficulty.name(),timeTaken,solved,notes);
+        int attemptId=repository.recordAttempt(title,platform,topic,difficulty,timeTaken,solved,notes);
         System.out.println("Attempt recorded with ID: " + attemptId);
     }
 
@@ -100,10 +100,10 @@ public class Main {
         boolean deleted=repository.deleteById(id);
 
         if(deleted){
-            System.out.println("deleted successfully!");
+            System.out.println("Attempt deleted successfully.");
         }
         else{
-            System.out.println("No problems found in that topic!");
+            System.out.println("Unable to delete the selected attempt.");
         }
     }
 
@@ -163,7 +163,7 @@ public class Main {
             }
         }
 
-        System.out.print("\n---- Exploration Areas (Low Exposure) ----");
+        System.out.println("\n---- Exploration Areas (Low Exposure) ----");
 
         if (report.getExplorationTopics().isEmpty()) {
             System.out.println("All topics sufficiently explored.");
@@ -231,7 +231,7 @@ public class Main {
 
             case 4:
                 System.out.print("Enter new Notes: ");
-                String notes = in.nextLine();
+                String notes = in.nextLine().trim();
                 updated = repository.updateNotes(id, notes);
                 break;
 
@@ -367,7 +367,7 @@ public class Main {
     private static boolean readBoolean(String prompt) {
         while (true) {
             System.out.print(prompt);
-            String input = in.nextLine().trim().toLowerCase();
+            String input = in.nextLine().trim().toLowerCase(Locale.ROOT);
 
             if (input.equals("true") || input.equals("yes") || input.equals("y")) {
                 return true;
@@ -421,14 +421,37 @@ public class Main {
         }
     }
 
-    private static void ExportReport(){
+    private static void exportReport(){
         if(repository.isEmpty()){
             System.out.println("no problems logged yet!");
             return;
         }
         AnalyticsEngine analytics = new AnalyticsEngine(repository.getAllAttempts());
-        ReportExporter.exportToTxt(analytics, "analytics_report.txt");
+        System.out.println("\nExport Format");
+        System.out.println("1. TXT");
+        System.out.println("2. CSV");
+        System.out.println("3. Cancel");
 
-        System.out.println("Report exported successfully!");
+        int choice = readIntInRange("Choose format: ", 1, 3);
+
+        switch (choice) {
+
+            case 1:
+                if (ReportExporter.exportToTxt(analytics, "analytics_report.txt")) {
+                    System.out.println("TXT report exported successfully.");
+                }
+                break;
+
+            case 2:
+                if (ReportExporter.exportToCsv(analytics, "analytics_report.csv")) {
+                    System.out.println("CSV report exported successfully.");
+                }
+                break;
+
+            case 3:
+                System.out.println("Export cancelled.");
+                break;
+        }
+
     }
 }

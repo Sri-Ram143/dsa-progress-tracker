@@ -11,7 +11,7 @@ public enum Difficulty {
         this.label=label;
     }
 
-    public String getlabel(){
+    public String getLabel(){
         return label;
     }
 

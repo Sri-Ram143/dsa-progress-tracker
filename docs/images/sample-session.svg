@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="500" viewBox="0 0 980 500" role="img" aria-labelledby="title description">
+  <title id="title">DSA Progress Tracker terminal preview</title>
+  <desc id="description">A dark terminal window showing the DSA Progress Tracker menu and analytics summary.</desc>
+  <rect width="980" height="500" rx="14" fill="#0d1117"/>
+  <rect width="980" height="46" rx="14" fill="#161b22"/>
+  <rect y="30" width="980" height="16" fill="#161b22"/>
+  <circle cx="30" cy="23" r="7" fill="#ff5f57"/>
+  <circle cx="54" cy="23" r="7" fill="#febc2e"/>
+  <circle cx="78" cy="23" r="7" fill="#28c840"/>
+  <text x="108" y="28" fill="#8b949e" font-family="Segoe UI, Arial, sans-serif" font-size="15">DSA Progress Tracker</text>
+  <g font-family="Cascadia Code, Consolas, monospace" font-size="18">
+    <text x="34" y="86" fill="#58a6ff">$ java -cp target/classes tracker.cli.Main</text>
+    <text x="34" y="124" fill="#f0f6fc">---- DSA PROGRESS TRACKER ----</text>
+    <text x="34" y="154" fill="#c9d1d9">1. Add Problem     2. View Attempts     3. Delete Attempt</text>
+    <text x="34" y="182" fill="#c9d1d9">4. View Analytics  5. Update Attempt    6. Search / Filter</text>
+    <text x="34" y="210" fill="#c9d1d9">7. Export Report   8. Exit</text>
+    <text x="34" y="254" fill="#f0f6fc">Enter your choice: </text><text x="246" y="254" fill="#79c0ff">4</text>
+    <text x="34" y="300" fill="#f0f6fc">---- ANALYTICS ----</text>
+    <text x="34" y="330" fill="#c9d1d9">Total Problems: </text><text x="208" y="330" fill="#7ee787">12</text>
+    <text x="34" y="358" fill="#c9d1d9">Accuracy: </text><text x="142" y="358" fill="#7ee787">75.00%</text>
+    <text x="34" y="386" fill="#c9d1d9">Average Time: </text><text x="184" y="386" fill="#7ee787">28.42 mins</text>
+    <text x="34" y="430" fill="#d2a8ff">Focus area: Graphs — Low Accuracy, Slow Performance</text>
+  </g>
+</svg>

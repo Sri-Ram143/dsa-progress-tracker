@@ -1,2 +1,1 @@
-1|two sum|leetcode|Array|MEDIUM|8|true|easy one|2026-03-04T12:27:32.705699100
-2|mid number|leetcode|array|EASY|2|true|nice sum|2026-07-10T09:39:28.579920100
+2|two sum|leetcode|Array|EASY|2|true|good problem|2026-07-20T19:24:08.273932300

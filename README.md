@@ -1,124 +1,130 @@
 # DSA Progress Tracker
 
-A Java command-line application for tracking Data Structures and Algorithms practice attempts, analyzing topic-wise performance, and identifying areas that need more focus.
+A polished Java command-line application for recording Data Structures and Algorithms practice, spotting weak areas, and building a more intentional interview-preparation routine.
 
-This project is built as a learning-focused portfolio project. It starts with a simple CLI tracker and gradually grows into a more useful personal analytics tool for coding practice.
+Instead of only counting solved problems, the tracker turns each practice attempt into useful feedback: accuracy, speed, consistency, topic confidence, and recommended focus areas.
+
+![Terminal preview](docs/images/sample-session.svg)
 
 ## Features
 
-- Add coding problem attempts with title, platform, topic, difficulty, time taken, solved status, and notes
-- View all recorded attempts
-- Search and filter attempts by title, topic, platform, difficulty, or solved status
-- Normalize topic names so casing and extra spaces do not split analytics results
-- Update attempt details such as difficulty, time taken, solved status, and notes
-- Delete attempts by selecting the correct attempt ID
-- Store attempts in a local text file
-- Calculate overall analytics:
-  - total problems attempted
-  - total solved
-  - accuracy percentage
-  - average solving time
-  - current practice streak
-  - longest practice streak
-  - problems solved this week
-- Generate topic-wise diagnostics:
-  - attempts per topic
-  - topic accuracy
-  - average time per topic
-  - confidence level
-- Recommend focus areas based on weak performance or low exposure
+- Record an attempt with its title, platform, topic, difficulty, solving time, outcome, and optional notes.
+- View, update, delete, search, and filter saved attempts.
+- Validate interactive input clearly and safely:
+  - menu selections must be valid numbers in range;
+  - titles, platforms, and topics cannot be blank;
+  - solving time must be a positive whole number;
+  - solved status accepts `true`/`false`, `yes`/`no`, or `y`/`n`;
+  - difficulty is limited to Easy, Medium, or Hard.
+- Save attempts locally between sessions in `problems.txt`.
+- Normalize topic names, so entries such as `array`, ` Array `, and `ARRAY` are analyzed together.
+- View overall metrics: total attempts, total solved, accuracy, average time, current and longest streaks, and problems solved this week.
+- Receive per-topic diagnostics for attempts, accuracy, average time, and confidence level.
+- Get data-driven recommendations for under-explored, low-accuracy, and slower-than-average topics.
+- Export analytics to both readable TXT and spreadsheet-friendly CSV reports.
+- Run automated tests for the analytics engine with Maven and JUnit 5.
 
-## Why I Built This
-
-While practicing DSA, it is easy to count solved problems but harder to understand actual progress. This project helps track not just quantity, but also topic strength, solving speed, consistency, and weak areas.
-
-The goal is to turn raw practice history into useful feedback for better preparation.
-
-## Tech Stack
-
-- Java
-- Object-Oriented Programming
-- File handling
-- Collections
-- CLI-based user interaction
-
-## Project Structure
+## Sample Output
 
 ```text
-src/
-  tracker/
-    analytics/
-      AnalyticsEngine.java
-      Recommendation.java
-      RecommendationReport.java
-      TopicReport.java
-    cli/
-      Main.java
-    models/
-      Attempt.java
-      Difficulty.java
-    storage/
-      AttemptRepository.java
-      FileHandler.java
-```
-
-## How To Run
-
-Compile the project:
-
-```bash
-javac -d out src/tracker/models/*.java src/tracker/storage/*.java src/tracker/analytics/*.java src/tracker/cli/*.java
-```
-
-Run the application:
-
-```bash
-java -cp out tracker.cli.Main
-```
-
-## Sample Menu
-
-```text
-----MENU----
+---- DSA PROGRESS TRACKER ----
 1. Add Problem
 2. View Attempts
 3. Delete Attempt
 4. View Analytics
 5. Update Attempt
-6. Search/Filter Attempts
-7. Exit
+6. Search / Filter Attempts
+7. Export Report
+8. Exit
+
+Enter Time Taken (in minutes): -5
+Please enter a number greater than 0.
+
+---- ANALYTICS ----
+Total Problems: 12
+Total Solved: 9
+Accuracy: 75.00%
+Average Time: 28.42 mins
+
+---- Focus Areas (Weak Performance) ----
+Topic: Graphs
+- Low Accuracy (<60%)
+- Slow Performance (Above overall avg)
 ```
 
-## Current Analytics Logic
+## Analytics Rules
 
-The app evaluates progress using simple rules:
+| Signal | Rule |
+| --- | --- |
+| Under-explored topic | Fewer than 3 attempts |
+| Weak topic | At least 3 attempts and accuracy below 60% |
+| Slow topic | At least 3 attempts and average time above the overall average |
+| Topic confidence | Under-Explored: 0–2, Developing: 3–5, Mature: 6+ attempts |
+| Current streak | Consecutive practice days ending today or yesterday |
 
-- Topics with fewer than 3 attempts are marked as low exposure areas
-- Topics with accuracy below 60% are marked as weak performance areas
-- Topics taking more than the overall average time are marked as slow performance areas
-- Each topic receives a confidence level based on attempt count
-- Streaks are calculated from unique practice dates, so multiple attempts on the same day count as one streak day
+Multiple attempts on the same day count as one practice day for streak calculations.
 
-## Learning Goals
+## Tech Stack
 
-This project is being developed step by step to practice:
+- Java 17
+- Maven
+- JUnit 5
+- Java Collections and file I/O
+- Object-oriented design
 
-- clean Java class design
-- separation of concerns
-- file-based persistence
-- analytics logic
-- input validation
-- Git and GitHub workflow
-- writing professional project documentation
+## How to Run
 
-## Planned Improvements
+### Prerequisites
 
-- Improve input validation and error handling
-- Export analytics reports
-- Move from text-file storage to CSV, JSON, or SQLite
-- Add unit tests for analytics logic
-- Convert the project to Maven or Gradle
+Install Java 17 or newer. Maven is recommended for compiling and running the test suite.
 
-## Status
+### With Maven
 
-In active development. The current version is a functional CLI tracker with basic analytics and recommendation support.
+```bash
+mvn test
+mvn compile
+java -cp target/classes tracker.cli.Main
+```
+
+### With the Java compiler
+
+```bash
+javac -d out src/tracker/models/*.java src/tracker/storage/*.java src/tracker/analytics/*.java src/tracker/reports/*.java src/tracker/cli/*.java
+java -cp out tracker.cli.Main
+```
+
+The application creates or updates `problems.txt` in the directory from which it is run. Use a copy of the file if you want to experiment without changing your saved history.
+
+## Folder Structure
+
+```text
+dsa-progress-tracker/
+├── docs/
+│   └── images/
+│       └── sample-session.svg       # README terminal preview
+├── src/
+│   └── tracker/
+│       ├── analytics/               # Metrics, topic reports, recommendations
+│       ├── cli/                     # Interactive command-line interface
+│       ├── models/                  # Attempt and difficulty domain models
+│       ├── reports/                 # TXT and CSV export
+│       └── storage/                 # Local persistence and repository operations
+├── test/
+│   └── tracker/analytics/           # JUnit analytics tests
+├── pom.xml                          # Maven build and test configuration
+├── problems.txt                     # Local attempt data, created at runtime
+└── README.md
+```
+
+## Future Improvements
+
+- Add a dedicated data directory and configurable storage location.
+- Support CSV, JSON, or SQLite as optional storage back ends.
+- Add date-range filtering and visual progress charts.
+- Expand the test suite to cover persistence, repository operations, and report exports.
+- Package the application as a runnable JAR.
+- Add a lightweight desktop or web interface while keeping the analytics engine reusable.
+
+## Why I Built It
+
+DSA preparation is often tracked as a raw problem count. This project focuses on the signals behind that number—where time is going, which topics need repetition, and whether practice is consistent—so every session can inform the next one.

@@ -90,12 +90,24 @@ public class Attempt {
     // ===== Convert to File Format =====
 
     public String toFileFormat() {
-        return attemptId + "|" + problemTitle + "|" + platform + "|" + topic + "|" + difficulty.name() + "|" + timeTaken + "|" + solved + "|" + notes + "|" +timestamp.toString();
+        return attemptId + "|" + escapeForStorage(problemTitle) + "|" + escapeForStorage(platform)
+                + "|" + escapeForStorage(topic) + "|" + difficulty.name() + "|" + timeTaken
+                + "|" + solved + "|" + escapeForStorage(notes) + "|" + timestamp;
+    }
+
+    private String escapeForStorage(String value) {
+        return value.replace("\\", "\\\\")
+                .replace("|", "\\|")
+                .replace("\r", "\\r")
+                .replace("\n", "\\n");
     }
 
     //convert to file
     @Override
     public String toString() {
-        return "ID: " + attemptId + ", Title: " + problemTitle + ", Platform: " + platform + ", Topic: " + getDisplayTopic() + ", Difficulty: " + difficulty.getlabel() + ", Time: " + timeTaken + " mins" + ", Solved: " + solved + ", Notes: " + notes + ", Time: " +timestamp.toString();
+        return "ID: " + attemptId + ", Title: " + problemTitle + ", Platform: " + platform
+                + ", Topic: " + getDisplayTopic() + ", Difficulty: " + difficulty.getLabel()
+                + ", Time: " + timeTaken + " mins, Solved: " + solved + ", Notes: " + notes
+                + ", Logged: " + timestamp;
     }
 }

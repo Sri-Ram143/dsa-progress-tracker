@@ -7,18 +7,26 @@ import tracker.models.Difficulty;
 import java.time.LocalDateTime;
 
 public class AttemptRepository {
-    private List<Attempt> attempts;
+    private final List<Attempt> attempts;
     public AttemptRepository(){
         attempts=FileHandler.loadAttemptsFromFile();
     }
-    public int recordAttempt(String title,String platform,String topic,String difficultyInput,int timeTaken,boolean solved,String notes){
+    public int recordAttempt(String title, String platform, String topic, Difficulty difficulty, int timeTaken, boolean solved, String notes) {
+        validateRequiredText(title, "Title");
+        validateRequiredText(platform, "Platform");
+        validateRequiredText(topic, "Topic");
+        if (difficulty == null) {
+            throw new IllegalArgumentException("Difficulty is required.");
+        }
+        if (timeTaken <= 0) {
+            throw new IllegalArgumentException("Time taken must be greater than 0.");
+        }
         int nextId = generateNextAttemptId();
         LocalDateTime timestamp=LocalDateTime.now();
         title = normalizeStorage(title);
         topic = normalizeTopicName(topic);
         platform = normalizeStorage(platform);
-        Difficulty difficulty= Difficulty.fromString(difficultyInput);
-        Attempt attempt = new Attempt(nextId,title,platform,topic,difficulty,timeTaken,solved,notes,timestamp);
+        Attempt attempt = new Attempt(nextId,title,platform,topic,difficulty,timeTaken,solved,notes == null ? "" : notes.trim(),timestamp);
         attempts.add(attempt);
         FileHandler.saveAttemptsToFile(attempts);
 
@@ -27,6 +35,12 @@ public class AttemptRepository {
 
     private String normalizeStorage(String input) {
         return input.trim().replaceAll("\\s+", " ");
+    }
+
+    private void validateRequiredText(String input, String fieldName) {
+        if (input == null || input.trim().isEmpty()) {
+            throw new IllegalArgumentException(fieldName + " cannot be empty.");
+        }
     }
 
     private String normalizeTopicName(String input) {
@@ -78,7 +92,7 @@ public class AttemptRepository {
     }
 
     public List<Attempt> getAllAttempts(){
-        return attempts;
+        return List.copyOf(attempts);
     }
     public boolean isEmpty(){
         return attempts.isEmpty();
@@ -93,6 +107,9 @@ public class AttemptRepository {
     }
 
     public boolean updateDifficulty(int id,Difficulty newDifficulty){
+        if (newDifficulty == null) {
+            return false;
+        }
         Attempt attempt=findById(id);
 
         if(attempt==null){
@@ -106,6 +123,9 @@ public class AttemptRepository {
     }
 
     public boolean updateTimeTaken(int id,int newTime){
+        if (newTime <= 0) {
+            return false;
+        }
         Attempt attempt=findById(id);
 
         if(attempt==null){
@@ -155,10 +175,10 @@ public class AttemptRepository {
             return matched;
         }
 
-        String normalOutput=normalize(title);
+        String normalizedTitle = normalize(title);
 
         for(Attempt attempt:attempts){
-            if(normalize(attempt.getProblemTitle()).trim().equalsIgnoreCase(normalOutput)){
+            if(normalize(attempt.getProblemTitle()).contains(normalizedTitle)){
                 matched.add(attempt);
             }
         }
