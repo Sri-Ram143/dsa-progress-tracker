@@ -8,7 +8,7 @@ public class Recommendation {
     private List<String> reasons;
     public Recommendation(String topic){
         this.topic=topic;
-        this.reasons=new ArrayList<>();
+        this.reasons=new ArrayList<>(   );
     }
 
     public String getTopic(){

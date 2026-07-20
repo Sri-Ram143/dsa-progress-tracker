@@ -9,6 +9,7 @@ import tracker.storage.AttemptRepository;
 import tracker.analytics.AnalyticsEngine;
 import tracker.analytics.TopicReport;
 import tracker.analytics.RecommendationReport;
+import tracker.reports.ReportExporter;
 
 public class Main {
     private static final Scanner in = new Scanner(System.in);
@@ -18,8 +19,8 @@ public class Main {
         repository=new AttemptRepository();
         while (true) {
             System.out.println("----MENU----");
-            System.out.println("1.Add Problem\n2.View Attempts\n3.Delete Attempt\n4.View Analytics\n5.Update Attempt\n6.Search/Filter Attempts\n7.Exit\n");
-            int choice = readIntInRange("Enter your choice: ", 1, 7);
+            System.out.println("1.Add Problem\n2.View Attempts\n3.Delete Attempt\n4.View Analytics\n5.Update Attempt\n6.Search/Filter Attempts\n7.Export Report\n8.Exit\n");
+            int choice = readIntInRange("Enter your choice: ", 1, 8);
             switch (choice) {
                 case 1:
                     recordAttempt();
@@ -40,6 +41,9 @@ public class Main {
                     searchAttempts();
                     break;
                 case 7:
+                    ExportReport();
+                    break;
+                case 8:
                     System.out.println("exiting program!");
                     return;
             }
@@ -415,5 +419,16 @@ public class Main {
 
             System.out.println("Invalid selection. Choose from displayed IDs.");
         }
+    }
+
+    private static void ExportReport(){
+        if(repository.isEmpty()){
+            System.out.println("no problems logged yet!");
+            return;
+        }
+        AnalyticsEngine analytics = new AnalyticsEngine(repository.getAllAttempts());
+        ReportExporter.exportToTxt(analytics, "analytics_report.txt");
+
+        System.out.println("Report exported successfully!");
     }
 }

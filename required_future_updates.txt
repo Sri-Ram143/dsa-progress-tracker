@@ -1,5 +1,35 @@
-A) Improvement Velocity (problem-level)
-B) Struggle Index (topic-level)
-C) Recovery Rate
-D) Stability Score
-E) Difficulty Efficiency
+Export Report
+Add an option to export analytics into a .txt or .csv report. This is very LinkedIn-friendly because you can say the app generates learning reports.
+
+Input Validation
+Make the CLI more polished by handling bad inputs gracefully:
+wrong menu choice
+negative time
+invalid boolean input
+empty title/topic/platform
+
+README With Screenshots
+This matters a lot for GitHub. Add:
+project overview
+features
+sample screenshots/output
+how to run
+folder structure
+future improvements
+
+Use Maven Or Gradle
+Right now it looks like a plain IntelliJ Java project. Adding Maven would make it feel much more professional and easier for others to run.
+
+Unit Tests
+Add tests for the analytics engine:
+total solved
+accuracy
+average time
+topic recommendations
+This gives the project a serious engineering feel.
+
+Better Data Storage
+   Current text-file storage is okay, but you can level it up with:
+CSV storage as a simpler upgrade
+JSON storage as a cleaner professional upgrade
+SQLite as an advanced upgrade

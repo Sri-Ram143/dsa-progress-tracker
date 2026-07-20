@@ -1,0 +1,34 @@
+DSA PROGRESS REPORT
+==========================
+
+Generated On: 2026-07-20T16:19:31.058340900
+
+SUMMARY
+-------
+Total Attempts : 2
+Total Solved   : 2
+Accuracy       : 100.00%
+Average Time   : 5.00 mins
+Current Streak : 1 day(s)
+Longest Streak : 1 day(s)
+Solved This Week : 0
+
+TOPIC DIAGNOSTICS
+-----------------
+
+Topic: Array
+Attempts: 2
+Accuracy: 100.00%
+Average Time: 5.00 mins
+Confidence: Under-Explored
+
+RECOMMENDATIONS
+---------------
+
+Weak Performance
+None
+
+Low Exposure Topics
+Topic: Array
+- Low Exposure (<3 attempts)
+
